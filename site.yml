@@ -56,6 +56,13 @@
     - role: argocd
       become: true
 
+- name: Setup Cert Manager
+  hosts: master
+  environment: "{{ proxy_env | default({}) }}"
+  roles:
+    - role: cert-manager
+      become: true
+
 - name: Storing kubeconfig in the playbook directory
   hosts: master
   environment: "{{ proxy_env | default({}) }}"
