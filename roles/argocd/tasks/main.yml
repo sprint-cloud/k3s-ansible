@@ -1,0 +1,75 @@
+- name: Create manifests directory for temp configuration
+  ansible.builtin.file:
+    path: /tmp/argocd
+    state: directory
+    owner: "{{ ansible_user_id }}"
+    mode: "0755"
+  with_items: "{{ groups[group_name_master | default('master')] }}"
+  run_once: true
+
+- name: Create manifests directory on first master
+  ansible.builtin.file:
+    path: /var/lib/rancher/k3s/server/manifests
+    state: directory
+    owner: root
+    group: root
+    mode: "0644"
+  when: ansible_hostname == hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname']
+
+- name: "Generate manifests"
+  ansible.builtin.template:
+    src: templates/{{ item }}.j2
+    dest: /tmp/argocd/{{ item  }}
+    owner: root
+    group: root
+    mode: "0644"
+  when: ansible_hostname == hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname']
+  with_items:
+    - namespace.yaml
+    - kustomization.yaml
+
+- name: "Apply manifests"
+  ansible.builtin.command: k3s kubectl apply -k /tmp/argocd
+  when: ansible_hostname == hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname']
+
+- name: Test argocd namespace
+  ansible.builtin.command: >-
+    k3s kubectl -n argocd
+  changed_when: false
+  with_items: "{{ groups[group_name_master | default('master')] }}"
+  run_once: true
+
+- name: Wait for ArgoCD resources
+  ansible.builtin.command: >-
+    k3s kubectl wait {{ item.resource }}
+    --namespace='argocd'
+    {% if item.name | default(False) -%}{{ item.name }}{%- endif %}
+    {% if item.selector | default(False) -%}--selector='{{ item.selector }}'{%- endif %}
+    {% if item.condition | default(False) -%}{{ item.condition }}{%- endif %}
+    --timeout='{{ argocd_available_timeout }}'
+  changed_when: false
+  run_once: true
+  with_items:
+    - description: Dex auth server
+      resource: deployment
+      name: argocd-dex-server
+      condition: --for condition=Available=True
+    - description: Notification controller 
+      resource: deployment
+      name: argocd-notifications-controller
+      condition: --for condition=Available=True
+    - description: Repo server 
+      resource: deployment
+      name: argocd-repo-server
+      condition: --for condition=Available=True
+    - description: ArgoCD server 
+      resource: deployment
+      name: argocd-server
+      condition: --for condition=Available=True
+    - description: Application set controller 
+      resource: deployment
+      name: argocd-applicationset-controller
+      condition: --for condition=Available=True
+
+  loop_control:
+    label: "{{ item.description }}"
