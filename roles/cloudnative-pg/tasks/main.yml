@@ -1,0 +1,36 @@
+- name: Create manifests directory on first master
+  ansible.builtin.file:
+    path: /var/lib/rancher/k3s/server/manifests
+    state: directory
+    owner: root
+    group: root
+    mode: "0644"
+  when: ansible_hostname == hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname']
+
+- name: "Download to first master: mainfest for Cloudnative PG"
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/main/releases/cnpg-{{ cnpg_version }}.yaml
+    mode: "0644"
+    owner: root
+    group: root
+    dest: /var/lib/rancher/k3s/server/manifests/cnpg-ng.yaml
+  when: ansible_hostname == hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname']
+
+- name: Wait for Cloudnative PG resources
+  ansible.builtin.command: >-
+    k3s kubectl wait {{ item.resource }}
+    --namespace='cnpg-system'
+    {% if item.name | default(False) -%}{{ item.name }}{%- endif %}
+    {% if item.selector | default(False) -%}--selector='{{ item.selector }}'{%- endif %}
+    {% if item.condition | default(False) -%}{{ item.condition }}{%- endif %}
+    --timeout='{{ cnpg_available_timeout }}'
+  changed_when: false
+  run_once: true
+  with_items:
+    - description: controller
+      resource: deployment
+      name: cnpg-controller-manager
+      condition: --for condition=Available=True
+
+  loop_control:
+    label: "{{ item.description }}"
