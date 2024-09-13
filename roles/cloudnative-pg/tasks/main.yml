@@ -16,6 +16,13 @@
     dest: /var/lib/rancher/k3s/server/manifests/cnpg-ng.yaml
   when: ansible_hostname == hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname']
 
+- name: Test cnpg-system namespace
+  ansible.builtin.command: >-
+    k3s kubectl -n cnpg-system
+  changed_when: false
+  with_items: "{{ groups[group_name_master | default('master')] }}"
+  run_once: true
+
 - name: Wait for Cloudnative PG resources
   ansible.builtin.command: >-
     k3s kubectl wait {{ item.resource }}

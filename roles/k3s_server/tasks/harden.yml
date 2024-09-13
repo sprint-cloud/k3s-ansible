@@ -1,0 +1,15 @@
+- name: Ensure /var/lib/rancher/k3s/server exists
+  ansible.builtin.file:
+    path: /var/lib/rancher/k3s/server
+    owner: root
+    group: root
+    mode: 0644
+    state: directory
+
+- name: Render Admission control config
+  ansible.builtin.template:
+    src: templates/psa.yaml.j2
+    dest: /var/lib/rancher/k3s/server/psa.yaml
+    mode: 0644
+    owner: root
+    group: root

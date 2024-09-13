@@ -18,6 +18,9 @@
   failed_when: false
   changed_when: false
 
+- name: Harden K3s server
+  ansible.builtin.include_tasks: harden.yml
+
 - name: Deploy K3s http_proxy conf
   ansible.builtin.include_tasks: http_proxy.yml
   when: proxy_env is defined

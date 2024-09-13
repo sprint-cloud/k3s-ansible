@@ -67,3 +67,30 @@
     path: /etc/sudoers
     validate: visudo -cf %s
   when: ansible_os_family in [ "RedHat", "Suse" ]
+
+- name: Harden kernel
+  block:
+    - ansible.posix.sysctl:
+        name: vm.panic_on_oom
+        value: 0
+        state: present
+        reload: true
+
+    - ansible.posix.sysctl:
+        name: vm.overcommit_memory
+        value: 1
+        state: present
+        reload: true
+
+    - ansible.posix.sysctl:
+        name: kernel.panic
+        value: 10
+        state: present
+        reload: true
+
+    - ansible.posix.sysctl:
+        name: kernel.panic_on_oops
+        value: 1
+        reload: true
+        state: present
+  tags: sysctl

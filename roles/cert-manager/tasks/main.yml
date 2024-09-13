@@ -39,7 +39,7 @@
   with_items: "{{ groups[group_name_master | default('master')] }}"
   run_once: true
 
-- name: Wait for ArgoCD resources
+- name: Wait for Cert Manager resources
   ansible.builtin.command: >-
     k3s kubectl wait {{ item.resource }}
     --namespace='cert-manager'
