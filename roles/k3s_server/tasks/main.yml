@@ -27,10 +27,16 @@
 
 - name: Deploy vip manifest
   ansible.builtin.include_tasks: vip.yml
+
 - name: Deploy metallb manifest
   ansible.builtin.include_tasks: metallb.yml
   tags: metallb
   when: kube_vip_lb_ip_range is not defined and (not cilium_bgp or cilium_iface is not defined)
+
+- name: Deploy Cloudnative PG manifest
+  ansible.builtin.include_tasks: cnpg.yml
+  tags: cnpg
+  when: cnpg_enable
 
 - name: Deploy kube-vip manifest
   ansible.builtin.include_tasks: kube-vip.yml

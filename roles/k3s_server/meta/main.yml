@@ -119,3 +119,12 @@ argument_specs:
       systemd_dir:
         description: Path to systemd services
         default: /etc/systemd/system
+      
+      cnpg_enable:
+        description: Enable CNPG Postgres operator
+        default: false
+        type: bool
+
+      cnpg_version:
+        description: The Cloudnative PG version to be deployed
+        default: 1.24.0

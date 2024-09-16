@@ -143,3 +143,8 @@ argument_specs:
       metal_lb_bgp_peer_address:
         description: BGP peer address
         default: ~
+
+      cnpg_enable:
+        description: Enable Cloudnative PG
+        type: bool
+        default: false

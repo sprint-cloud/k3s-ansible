@@ -1,0 +1,18 @@
+---
+- name: Create manifests directory on first master
+  ansible.builtin.file:
+    path: /var/lib/rancher/k3s/server/manifests
+    state: directory
+    owner: root
+    group: root
+    mode: "0644"
+  when: ansible_hostname == hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname']
+
+- name: "Download to first master: manifest for Cloudnative PG"
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/main/releases/cnpg-{{ cnpg_version }}.yaml # noqa yaml[line-length]
+    dest: /var/lib/rancher/k3s/server/manifests/cnpg-crds.yaml
+    owner: root
+    group: root
+    mode: "0644"
+  when: ansible_hostname == hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname']
