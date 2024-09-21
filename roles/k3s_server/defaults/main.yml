@@ -41,3 +41,7 @@ podsec:
   enforce: restricted
   audit: restricted
   warn: restricted
+
+longhorn_enable: false
+longhorn_helm_version: "1.7.1"
+longhorn_values: {}

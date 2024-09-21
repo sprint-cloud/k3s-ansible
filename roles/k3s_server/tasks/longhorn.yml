@@ -1,0 +1,22 @@
+---
+- name: Create manifests directory on first master
+  ansible.builtin.file:
+    path: /var/lib/rancher/k3s/server/manifests
+    state: directory
+    owner: root
+    group: root
+    mode: "0644"
+  when: ansible_hostname == hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname']
+  tags:
+    - longhorn
+
+- name: Deploy Longhorn helm manifest
+  ansible.builtin.template:
+    src: longhorn-install.yaml.j2
+    dest: /var/lib/rancher/k3s/server/manifests/longhorn-install.yaml
+    owner: root
+    group: root
+    mode: "0644"
+  when: ansible_hostname == hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname']
+  tags:
+   - longhorn

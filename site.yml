@@ -18,6 +18,8 @@
     - role: devsec.hardening.ssh_hardening
       become: true
       when: harden_k3s_nodes
+  tags:
+    - harden
   
 
 - name: Prepare k3s nodes

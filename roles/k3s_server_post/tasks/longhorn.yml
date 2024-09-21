@@ -1,0 +1,47 @@
+---
+- name: Test longhorn-system namespace
+  ansible.builtin.command: >-
+    k3s kubectl -n longhorn-system
+  changed_when: false
+  with_items: "{{ groups[group_name_master | default('master')] }}"
+  run_once: true
+
+- name: Wait for Longhorn resources
+  ansible.builtin.command: >-
+    k3s kubectl wait {{ item.resource }}
+    --namespace='longhorn-system'
+    {% if item.name | default(False) -%}{{ item.name }}{%- endif %}
+    {% if item.selector | default(False) -%}--selector='{{ item.selector }}'{%- endif %}
+    {% if item.condition | default(False) -%}{{ item.condition }}{%- endif %}
+    --timeout='{{ cnpg_available_timeout }}'
+  changed_when: false
+  run_once: true
+  with_items:
+    - description: csi-attacher
+      resource: deployment
+      name: csi-attacher
+      condition: --for condition=Available=True
+    - description: csi-provisioner
+      resource: deployment
+      name: csi-provisioner
+      condition: --for condition=Available=True
+    - description: csi-resizer
+      resource: deployment
+      name: csi-resizer
+      condition: --for condition=Available=True
+    - description: csi-snapshotter
+      resource: deployment
+      name: csi-snapshotter
+      condition: --for condition=Available=True
+    - description: longhorn-driver-deployer
+      resource: deployment
+      name: longhorn-driver-deployer
+      condition: --for condition=Available=True
+    - description: longhorn-ui
+      resource: deployment
+      name: longhorn-ui
+      condition: --for condition=Available=True
+  loop_control:
+    label: "{{ item.description }}"
+  tags:
+   - longhorn

@@ -33,10 +33,15 @@
   tags: metallb
   when: kube_vip_lb_ip_range is not defined and (not cilium_bgp or cilium_iface is not defined)
 
-- name: Deploy Cloudnative PG manifest
+- name: Deploy Cloudnative PG operator
   ansible.builtin.include_tasks: cnpg.yml
   tags: cnpg
   when: cnpg_enable
+
+- name: Deploy Longhorn CSI
+  ansible.builtin.include_tasks: longhorn.yml
+  tags: longhorn
+  when: longhorn_enable
 
 - name: Deploy kube-vip manifest
   ansible.builtin.include_tasks: kube-vip.yml
