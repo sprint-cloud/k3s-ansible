@@ -13,7 +13,7 @@
     {% if item.name | default(False) -%}{{ item.name }}{%- endif %}
     {% if item.selector | default(False) -%}--selector='{{ item.selector }}'{%- endif %}
     {% if item.condition | default(False) -%}{{ item.condition }}{%- endif %}
-    --timeout='{{ cnpg_available_timeout }}'
+    --timeout='{{ longhorn_available_timeout }}'
   changed_when: false
   run_once: true
   with_items:
