@@ -1,0 +1,37 @@
+---
+cilium_chart_version: 1.16.1
+cilium_chart_repo: https://helm.cilium.io/
+cilium_iface: 'eth0'
+cilium_cluster_cidr: 10.52.0.0/16
+cilium_mode: native
+cilium_bgp: true
+cilium_replace_kube_proxy: true
+cilium_bpf_masquerade: true
+cilium_hubble: true
+cilium_bpf_lb_algorithm: maglev
+cilium_bpf_lb_mode: hybrid
+cilium_ingress_enable: true
+cilium_ingress_lb_mode: deticated
+#  # {{ 'devices=' + cilium_iface if cilium_iface != 'auto' else '' }}
+cilium_chart_values:
+  operator.replicas="1"
+  ipam.operator.clusterPoolIPv4PodCIDRList={{ cilium_cluster_cidr }}
+  {% if cilium_mode == "native" or (cilium_bgp and cilium_exportPodCIDR != 'false') %}
+  ipv4NativeRoutingCIDR={{ cilium_cluster_cidr }}
+  {% endif %}
+  k8sServiceHost="127.0.0.1"
+  k8sServicePort="6444"
+  routingMode={{ cilium_mode }}
+  autoDirectNodeRoutes={{ "true" if cilium_mode == "native" else "false" }}
+  kubeProxyReplacement={{ cilium_replace_kube_proxy }}
+  bpf.masquerade={{ cilium_bpf_masquerade }}
+  bgpControlPlane.enabled={{ cilium_bgp | default("false") }}
+  hubble.enabled={{ "true" if cilium_hubble else "false" }}
+  hubble.relay.enabled={{ "true" if cilium_hubble else "false" }}
+  hubble.ui.enabled={{ "true" if cilium_hubble else "false" }}
+  {% if cilium_replace_kube_proxy is not false %}
+  bpf.loadBalancer.algorithm={{ cilium_bpf_lb_algorithm }}
+  bpf.loadBalancer.mode={{ cilium_bpf_lb_mode }}
+  ingressController.enabled={{ cilium_ingress_enable }}
+  ingressController.loadbalancerMode={{ cilium_ingress_lb_mode }}
+  {% endif %}

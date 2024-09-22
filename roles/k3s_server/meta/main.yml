@@ -7,17 +7,6 @@ argument_specs:
         description: Virtual ip-address configured on each master
         required: true
 
-      cilium_bgp:
-        description:
-          - Enable cilium BGP control plane for LB services and pod cidrs.
-          - Disables the use of MetalLB.
-        type: bool
-        default: ~
-
-      cilium_iface:
-        description: The network interface used for when Cilium is enabled
-        default: ~
-
       extra_server_args:
         description: Extra arguments for server nodes
         default: ""
@@ -82,20 +71,6 @@ argument_specs:
         description: IP range for kube-vip load balancer
         default: ~
 
-      metal_lb_controller_tag_version:
-        description: Image tag for MetalLB
-        default: v0.14.3
-
-      metal_lb_speaker_tag_version:
-        description: Image tag for MetalLB
-        default: v0.14.3
-
-      metal_lb_type:
-        choices:
-          - frr
-          - native
-        default: native
-
       proxy_env:
         type: dict
         description: Internet proxy configurations
@@ -119,12 +94,3 @@ argument_specs:
       systemd_dir:
         description: Path to systemd services
         default: /etc/systemd/system
-      
-      cnpg_enable:
-        description: Enable CNPG Postgres operator
-        default: false
-        type: bool
-
-      cnpg_version:
-        description: The Cloudnative PG version to be deployed
-        default: 1.24.0

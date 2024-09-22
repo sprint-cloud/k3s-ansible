@@ -1,0 +1,13 @@
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: cilium
+  namespace: kube-system
+spec:
+  repo: {{ cilium_chart_repo }}
+  chart: cilium
+  version: {{ cilium_chart_version }}
+  targetNamespace: kube-system
+  valuesContent: |-
+    {{ cilium_chart_values }}
