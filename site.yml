@@ -48,11 +48,18 @@
     - role: k3s_agent
       become: true
 
-- name: Deploy Cilium networking stack
+- name: Deploy Cilium CNI
   hosts: master
   environment: "{{ proxy_env | default({}) }}"
   roles:
     - role: cilium
+      become: true
+
+- name: Deploy Longhorn CSI
+  hosts: master
+  environment: "{{ proxy_env | default({}) }}"
+  roles:
+    - role: longhorn
       become: true
 
 - name: Storing kubeconfig in the playbook directory

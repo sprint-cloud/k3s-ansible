@@ -1,0 +1,63 @@
+---
+- name: Create manifests directory on first master
+  ansible.builtin.file:
+    path: /var/lib/rancher/k3s/server/manifests
+    state: directory
+    owner: root
+    group: root
+    mode: "0644"
+  when: ansible_hostname == hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname']
+  tags:
+    - longhorn
+    - storage
+
+- name: Create Longhorn chart manifest on first master
+  ansible.builtin.template:
+    src: longhorn-chart.yaml.j2
+    dest: /var/lib/rancher/k3s/server/manifests/longhorn-chart.yaml
+    owner: root
+    group: root
+    mode: "0644"
+  when: ansible_hostname == hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname']
+  tags:
+    - longhorn
+    - storage
+
+- name: Wait for Longhorn resources
+  ansible.builtin.command: >-
+    {% if item.type == 'daemonset' %}
+    {{ k3s_kubectl_binary | default('k3s kubectl') }} wait pods
+    --namespace=longhorn-system
+    --selector={{ item.selector }}
+    --for=condition=Ready
+    {% else %}
+    {{ k3s_kubectl_binary | default('k3s kubectl') }} wait {{ item.type }}/{{ item.name }}
+    --namespace=longhorn-system
+    --for=condition=Available
+    {% endif %}
+    --timeout={{ longhorn_check_timeout }}
+  register: cr_result
+  changed_when: false
+  until: cr_result is succeeded
+  retries: 30
+  delay: 7
+  with_items:
+    - { name: longhorn-driver-deployer, type: deployment }
+    - { name: longhorn-manager, type: daemonset, selector: app.kubernetes.io/name=longhorn }
+    - { name: longhorn-ui, type: deployment}
+  loop_control:
+    label: "{{ item.type }}/{{ item.name }}"
+  tags:
+    - longhorn
+    - storage
+
+# - name: Configure Storage class
+#   ansible.builtin.template:
+#     src: cilium-bgp.yaml.j2
+#     dest: /var/lib/rancher/k3s/server/manifests/cilium-bgp.yaml
+#     owner: root
+#     group: root
+#     mode: '0644'
+#   tags:
+#     - longhorn
+#     - storage

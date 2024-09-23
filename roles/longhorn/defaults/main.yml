@@ -1,0 +1,9 @@
+---
+k3s_kubectl_binary: k3s kubectl
+longhorn_check_timeout: 360s
+longhorn_chart_version: 1.7.1
+longhorn_chart_repo: https://charts.longhorn.io
+longhorn_chart_values:
+  persistence:
+    defaultClassReplicaCount: 2
+    defaultDataLocality: best-effort
