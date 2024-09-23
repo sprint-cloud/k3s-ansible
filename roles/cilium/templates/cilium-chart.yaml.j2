@@ -5,6 +5,7 @@ metadata:
   name: cilium
   namespace: kube-system
 spec:
+  bootstrap: true
   repo: {{ cilium_chart_repo }}
   chart: cilium
   version: {{ cilium_chart_version }}
