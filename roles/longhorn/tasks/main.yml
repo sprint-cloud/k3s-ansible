@@ -53,7 +53,7 @@
 
 - name: Configure storage class for replicated volumes
   ansible.builtin.copy:
-    src: src/longhorn-repl-storageclass.yaml
+    src: longhorn-repl-storageclass.yaml
     dest: /var/lib/rancher/k3s/server/manifests/longhorn-repl-storageclass.yaml
     owner: root
     group: root
@@ -61,4 +61,3 @@
   tags:
     - longhorn
     - storage
-
