@@ -10,6 +10,7 @@ cilium_bgp_my_asn: 64512
 cilium_bgp_peer_asn: 64513
 
 cilium_chart_values:
+  policyEnforcementMode: always
   devices: eth0
   operator:
     replicas: 1

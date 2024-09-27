@@ -1,7 +1,7 @@
 ---
 - name: Create manifests directory on first master
   ansible.builtin.file:
-    path: /var/lib/rancher/k3s/server/manifests
+    path: /var/lib/rancher/k3s/server/manifests/cilium
     state: directory
     owner: root
     group: root
@@ -14,7 +14,7 @@
 - name: Create Cilium chart manifest on first master
   ansible.builtin.template:
     src: cilium-chart.yaml.j2
-    dest: /var/lib/rancher/k3s/server/manifests/cilium-chart.yaml
+    dest: /var/lib/rancher/k3s/server/manifests/cilium/chart.yaml
     owner: root
     group: root
     mode: "0644"
@@ -57,10 +57,31 @@
 - name: Configure BGP
   ansible.builtin.template:
     src: cilium-bgp.yaml.j2
-    dest: /var/lib/rancher/k3s/server/manifests/cilium-bgp.yaml
+    dest: /var/lib/rancher/k3s/server/manifests/cilium/cilium-bgp.yaml
     owner: root
     group: root
     mode: '0644'
+  tags:
+    - cilium
+    - networking
+
+- name: Allow Acces to Cilium health endpoints
+  ansible.builtin.copy:
+    src: defaultpolicy/allow-cilium-healthpoints.yaml
+    dest: /var/lib/rancher/k3s/server/manifests/cilium/allow-cilium-healthpoints.yaml
+    owner: root
+    group: root
+    mode: "0644"
+  tags:
+    - cilium
+    - networking
+- name: Allow Acces to dns from all pods
+  ansible.builtin.copy:
+    src: defaultpolicy/allow-dns.yaml
+    dest: /var/lib/rancher/k3s/server/manifests/cilium/allow-dns.yaml
+    owner: root
+    group: root
+    mode: "0644"
   tags:
     - cilium
     - networking
