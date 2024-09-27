@@ -35,7 +35,7 @@
     --namespace=kube-system
     --for=condition=Available
     {% endif %}
-    --timeout=cilium_check_timeout
+    --timeout={{ cilium_check_timeout }}
   register: cr_result
   changed_when: false
   until: cr_result is succeeded
