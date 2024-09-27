@@ -9,7 +9,15 @@ cilium_bgp_export_pods: false
 cilium_bgp_my_asn: 64512
 cilium_bgp_peer_asn: 64513
 
+# Only audit, no traffic is blocked
+cilium_pol_auditonly: false
+
 cilium_chart_values:
+  policyAuditMode: {{ cilium_pol_auditonly }}            
+  hostFirewall:
+    enabled: true                  # enable host policies
+  extraConfig:
+    allow-localhost: policy
   policyEnforcementMode: always
   devices: eth0
   operator:
