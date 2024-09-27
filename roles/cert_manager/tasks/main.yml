@@ -25,12 +25,12 @@
   ansible.builtin.command: >-
     {% if item.type == 'daemonset' %}
     {{ k3s_kubectl_binary | default('k3s kubectl') }} wait pods
-    --namespace=cert-manager
+    --namespace={{ cm_namespace }}
     --selector={{ item.selector }}
     --for=condition=Ready
     {% else %}
     {{ k3s_kubectl_binary | default('k3s kubectl') }} wait {{ item.type }}/{{ item.name }}
-    --namespace=cert-manager
+    --namespace={{ cm_namespace }}
     --for=condition=Available
     {% endif %}
     --timeout={{ longhorn_check_timeout }}
@@ -44,6 +44,15 @@
     label: "{{ item.type }}/{{ item.name }}"
   tags:
     - cm
+
+- name: Create Cloudflare secret
+  ansible.builtin.command: >-
+    {{ k3s_kubectl_binary | default('k3s kubectl') }} create secret generic
+    --namespace {{ cm_namespace }}
+    --from-literal=cloudflare-token=token
+    {{ cm_cf_secretname }}
+  changed_when: false
+  when: cf_secret_present is failed
 
 - name: Configure Letsencrypt cluster issuers
   ansible.builtin.template:

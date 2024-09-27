@@ -9,7 +9,7 @@ spec:
   repo: {{ cm_chart_repo }}
   chart: longhorn
   version: {{ cm_chart_version }}
-  targetNamespace: cert-manager
+  targetNamespace: {{ cm_namespace }}
   createNamespace: true
   valuesContent: |-
     {{ cm_chart_values }}
