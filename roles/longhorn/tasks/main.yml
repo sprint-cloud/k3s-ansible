@@ -51,13 +51,14 @@
     - longhorn
     - storage
 
-# - name: Configure Storage class
-#   ansible.builtin.template:
-#     src: cilium-bgp.yaml.j2
-#     dest: /var/lib/rancher/k3s/server/manifests/cilium-bgp.yaml
-#     owner: root
-#     group: root
-#     mode: '0644'
-#   tags:
-#     - longhorn
-#     - storage
+- name: Configure storage class for replicated volumes
+  ansible.builtin.copy:
+    src: src/longhorn-repl-storageclass.yaml
+    dest: /var/lib/rancher/k3s/server/manifests/longhorn-repl-storageclass.yaml
+    owner: root
+    group: root
+    mode: "0644"
+  tags:
+    - longhorn
+    - storage
+
