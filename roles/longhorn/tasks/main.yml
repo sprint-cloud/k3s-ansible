@@ -1,7 +1,7 @@
 ---
 - name: Create manifests directory on first master
   ansible.builtin.file:
-    path: /var/lib/rancher/k3s/server/manifests
+    path: /var/lib/rancher/k3s/server/manifests/longhorn
     state: directory
     owner: root
     group: root
@@ -14,7 +14,7 @@
 - name: Create Longhorn chart manifest on first master
   ansible.builtin.template:
     src: longhorn-chart.yaml.j2
-    dest: /var/lib/rancher/k3s/server/manifests/longhorn-chart.yaml
+    dest: /var/lib/rancher/k3s/server/manifests/longhorn/chart.yaml
     owner: root
     group: root
     mode: "0644"
@@ -54,7 +54,7 @@
 - name: Configure storage class for replicated volumes
   ansible.builtin.copy:
     src: longhorn-repl-storageclass.yaml
-    dest: /var/lib/rancher/k3s/server/manifests/longhorn-repl-storageclass.yaml
+    dest: /var/lib/rancher/k3s/server/manifests/longhorn/longhorn-repl-storageclass.yaml
     owner: root
     group: root
     mode: "0644"
