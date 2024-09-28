@@ -1,27 +1,27 @@
 ---
 - name: Create manifests directory on first master
   ansible.builtin.file:
-    path: /var/lib/rancher/k3s/server/manifests/cm
+    path: /var/lib/rancher/k3s/server/manifests/auth
     state: directory
     owner: root
     group: root
     mode: "0644"
   when: ansible_hostname == hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname']
   tags:
-    - cm
+    - auth
 
-- name: Create Cert Manager chart manifest on first master
+- name: Create Dex chart manifest on first master
   ansible.builtin.template:
-    src: cm-chart.yaml.j2
-    dest: /var/lib/rancher/k3s/server/manifests/cm/cm-chart.yaml
+    src: dex-chart.yaml.j2
+    dest: /var/lib/rancher/k3s/server/manifests/cm/dex-chart.yaml
     owner: root
     group: root
     mode: "0644"
   when: ansible_hostname == hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname']
   tags:
-    - cm
+    - auth
 
-- name: Wait for Cert Manager resources
+- name: Wait for Dex resources
   ansible.builtin.command: >-
     {% if item.type == 'daemonset' %}
     {{ k3s_kubectl_binary | default('k3s kubectl') }} wait pods
@@ -43,27 +43,4 @@
   loop_control:
     label: "{{ item.type }}/{{ item.name }}"
   tags:
-    - cm
-
-- name: Create Cloudflare secret
-  ansible.builtin.command: >-
-    {{ k3s_kubectl_binary | default('k3s kubectl') }} create secret generic
-    --namespace {{ cm_namespace }}
-    --from-literal=cloudflare-token=token
-    {{ cm_cf_secretname }}
-  changed_when: false
-  tags:
-    - cm
-
-- name: Configure Letsencrypt cluster issuers
-  ansible.builtin.template:
-    src: cm-acme.yaml.j2
-    dest: "/var/lib/rancher/k3s/server/manifests/cm/{{ item.name }}-issuer.yaml"
-    owner: root
-    group: root
-    mode: "0644"
-  tags:
-    - cm
-    - issuers
-  with_items:
-    - "{{ cm_acme }}"
+    - auth

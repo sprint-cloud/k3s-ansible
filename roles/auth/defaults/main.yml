@@ -1,8 +1,0 @@
----
-k3s_kubectl_binary: k3s kubectl
-dex_namespace: auth
-dex_check_timeout: 360s
-dex_chart_version: 0.19.1
-dex_chart_repo: https://charts.dexidp.io
-dex_chart_values: {}
-dex_ingress_domain: auth.example.com
