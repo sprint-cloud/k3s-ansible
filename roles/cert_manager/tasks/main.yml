@@ -33,7 +33,7 @@
     --namespace={{ cm_namespace }}
     --for=condition=Available
     {% endif %}
-    --timeout={{ longhorn_check_timeout }}
+    --timeout={{ cm_check_timeout }}
   register: cr_result
   changed_when: false
   until: cr_result is succeeded
@@ -52,12 +52,13 @@
     --from-literal=cloudflare-token=token
     {{ cm_cf_secretname }}
   changed_when: false
-  when: cf_secret_present is failed
+  tags:
+    - cm
 
 - name: Configure Letsencrypt cluster issuers
   ansible.builtin.template:
     src: cm-acme.yaml.j2
-    dest: "/var/lib/rancher/k3s/server/manifests/cm/{{ item.name }}_issuer.yaml"
+    dest: "/var/lib/rancher/k3s/server/manifests/cm/{{ item.name }}-issuer.yaml"
     owner: root
     group: root
     mode: "0644"

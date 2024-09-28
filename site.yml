@@ -62,6 +62,13 @@
     - role: longhorn
       become: true
 
+- name: Deploy Cert Manager
+  hosts: master
+  environment: "{{ proxy_env | default({}) }}"
+  roles:
+    - role: cert_manager
+      become: true
+
 - name: Storing kubeconfig in the playbook directory
   hosts: master
   environment: "{{ proxy_env | default({}) }}"

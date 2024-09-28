@@ -21,9 +21,9 @@ cm_cf_token: changethis
 cm_cf_secretname: cloudflare-token-secret
 cm_domain: example.com
 cm_acme:
-    - name: letsencrypt-staging
-      email: {{ cm_acme_email }}
-      server: https://acme-staging-v02.api.letsencrypt.org/directory
-    - name: letsencrypt-production
-      email: {{ cm_acme_email }}
-      server: https://acme-v02.api.letsencrypt.org/directory
+  - name: letsencrypt-staging
+    email: "{{ cm_acme_email }}"
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+  - name: letsencrypt-production
+    email: "{{ cm_acme_email }}"
+    server: https://acme-v02.api.letsencrypt.org/directory
