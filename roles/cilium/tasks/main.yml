@@ -65,23 +65,17 @@
     - cilium
     - networking
 
-- name: Allow Acces to Cilium health endpoints
+- name: Setup default clusterwide network policy
   ansible.builtin.copy:
-    src: defaultpolicy/allow-cilium-healthpoints.yaml
-    dest: /var/lib/rancher/k3s/server/manifests/cilium/allow-cilium-healthpoints.yaml
+    src: "defaultpolicy/{{ item }}"
+    dest: "/var/lib/rancher/k3s/server/manifests/cilium/{{ item }}"
     owner: root
     group: root
     mode: "0644"
-  tags:
-    - cilium
-    - networking
-- name: Allow Acces to dns from all pods
-  ansible.builtin.copy:
-    src: defaultpolicy/allow-dns.yaml
-    dest: /var/lib/rancher/k3s/server/manifests/cilium/allow-dns.yaml
-    owner: root
-    group: root
-    mode: "0644"
+  with_items:
+    - allow-cilium-healthpoints.yaml
+    - allow-dns.yaml
+    - allow-kube-api.yaml
   tags:
     - cilium
     - networking
