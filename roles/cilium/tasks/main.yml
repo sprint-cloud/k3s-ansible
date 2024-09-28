@@ -14,7 +14,7 @@
 - name: Create Cilium chart manifest on first master
   ansible.builtin.template:
     src: cilium-chart.yaml.j2
-    dest: /var/lib/rancher/k3s/server/manifests/cilium/chart.yaml
+    dest: /var/lib/rancher/k3s/server/manifests/cilium/cilium-chart.yaml
     owner: root
     group: root
     mode: "0644"

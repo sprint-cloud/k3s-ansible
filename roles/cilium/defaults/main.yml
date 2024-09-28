@@ -13,12 +13,12 @@ cilium_bgp_peer_asn: 64513
 cilium_pol_auditonly: false
 
 cilium_chart_values:
-  policyAuditMode: {{ cilium_pol_auditonly }}            
+  policyAuditMode: "{{ cilium_pol_auditonly }}"
+  policyEnforcementMode: always
   hostFirewall:
     enabled: true                  # enable host policies
   extraConfig:
     allow-localhost: policy
-  policyEnforcementMode: always
   devices: eth0
   operator:
     replicas: 1
