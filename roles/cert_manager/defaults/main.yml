@@ -27,3 +27,5 @@ cm_acme:
   - name: letsencrypt-production
     email: "{{ cm_acme_email }}"
     server: https://acme-v02.api.letsencrypt.org/directory
+
+cm_default_issuer: letsencrypt-staging
