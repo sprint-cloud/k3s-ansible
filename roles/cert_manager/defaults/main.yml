@@ -1,0 +1,29 @@
+---
+k3s_kubectl_binary: k3s kubectl
+cm_namespace: cert-manager
+cm_check_timeout: 360s
+cm_chart_version: v1.15.2
+cm_chart_repo: https://charts.jetstack.io
+cm_chart_values:
+  installCRDs: true
+  replicaCount: 3
+  extraArgs:
+    - --dns01-recursive-nameservers=1.1.1.1:53,9.9.9.9:53
+    - --dns01-recursive-nameservers-only
+  podDnsPolicy: None
+  podDnsConfig:
+    nameservers:
+      - 1.1.1.1
+      - 9.9.9.9
+
+cm_acme_email: admin@example.com
+cm_cf_token: changethis
+cm_cf_secretname: cloudflare-token-secret
+cm_domain: example.com
+cm_acme:
+    - name: letsencrypt-staging
+      email: {{ cm_acme_email }}
+      server: https://acme-staging-v02.api.letsencrypt.org/directory
+    - name: letsencrypt-production
+      email: {{ cm_acme_email }}
+      server: https://acme-v02.api.letsencrypt.org/directory

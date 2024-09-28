@@ -45,6 +45,6 @@ cilium_chart_values:
       algorithm: maglev
       mode: hybrid
   ingressController:
-    enabled: true
+    enabled: false
     default: true
     loadbalancerMode: deticated
