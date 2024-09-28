@@ -1,0 +1,15 @@
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: dex
+  namespace: kube-system
+spec:
+  bootstrap: false
+  repo: {{ dex_chart_repo }}
+  chart: dex
+  version: {{ dex_chart_version }}
+  targetNamespace: {{ dex_namespace }}
+  createNamespace: true
+  valuesContent: |-
+    {{ dex_chart_values }}

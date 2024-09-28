@@ -1,0 +1,69 @@
+---
+- name: Create manifests directory on first master
+  ansible.builtin.file:
+    path: /var/lib/rancher/k3s/server/manifests/cm
+    state: directory
+    owner: root
+    group: root
+    mode: "0644"
+  when: ansible_hostname == hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname']
+  tags:
+    - cm
+
+- name: Create Cert Manager chart manifest on first master
+  ansible.builtin.template:
+    src: cm-chart.yaml.j2
+    dest: /var/lib/rancher/k3s/server/manifests/cm/cm-chart.yaml
+    owner: root
+    group: root
+    mode: "0644"
+  when: ansible_hostname == hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname']
+  tags:
+    - cm
+
+- name: Wait for Cert Manager resources
+  ansible.builtin.command: >-
+    {% if item.type == 'daemonset' %}
+    {{ k3s_kubectl_binary | default('k3s kubectl') }} wait pods
+    --namespace={{ cm_namespace }}
+    --selector={{ item.selector }}
+    --for=condition=Ready
+    {% else %}
+    {{ k3s_kubectl_binary | default('k3s kubectl') }} wait {{ item.type }}/{{ item.name }}
+    --namespace={{ cm_namespace }}
+    --for=condition=Available
+    {% endif %}
+    --timeout={{ cm_check_timeout }}
+  register: cr_result
+  changed_when: false
+  until: cr_result is succeeded
+  retries: 30
+  delay: 7
+  with_items: []
+  loop_control:
+    label: "{{ item.type }}/{{ item.name }}"
+  tags:
+    - cm
+
+- name: Create Cloudflare secret
+  ansible.builtin.command: >-
+    {{ k3s_kubectl_binary | default('k3s kubectl') }} create secret generic
+    --namespace {{ cm_namespace }}
+    --from-literal=cloudflare-token=token
+    {{ cm_cf_secretname }}
+  changed_when: false
+  tags:
+    - cm
+
+- name: Configure Letsencrypt cluster issuers
+  ansible.builtin.template:
+    src: cm-acme.yaml.j2
+    dest: "/var/lib/rancher/k3s/server/manifests/cm/{{ item.name }}-issuer.yaml"
+    owner: root
+    group: root
+    mode: "0644"
+  tags:
+    - cm
+    - issuers
+  with_items:
+    - "{{ cm_acme }}"
