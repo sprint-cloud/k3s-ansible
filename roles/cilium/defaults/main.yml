@@ -8,17 +8,14 @@ cilium_bgp_peer_address: 10.10.10.1
 cilium_bgp_export_pods: false
 cilium_bgp_my_asn: 64512
 cilium_bgp_peer_asn: 64513
-
-# Only audit, no traffic is blocked
 cilium_pol_auditonly: false
+cilium_pol_enforcement_mode: default
 
 cilium_chart_values:
   policyAuditMode: "{{ cilium_pol_auditonly }}"
-  policyEnforcementMode: always
+  policyEnforcementMode: "{{ cilium_pol_enforcement_mode }}"
   hostFirewall:
-    enabled: true                  # enable host policies
-  extraConfig:
-    allow-localhost: policy
+    enabled: false
   devices: eth0
   operator:
     replicas: 1
@@ -44,7 +41,8 @@ cilium_chart_values:
     loadBalancer:
       algorithm: maglev
       mode: hybrid
+  l7Proxy: false
   ingressController:
-    enabled: true
+    enabled: false
     default: true
     loadbalancerMode: deticated

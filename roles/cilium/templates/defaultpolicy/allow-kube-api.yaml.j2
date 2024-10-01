@@ -25,7 +25,7 @@ spec:
 apiVersion: cilium.io/v2
 kind: CiliumClusterwideNetworkPolicy
 metadata:
-  name: kubelet
+  name: allow-kubelet-traffic
 spec:
   nodeSelector:
     matchLabels: {}
@@ -36,6 +36,40 @@ spec:
     - ports:
       - port: '10250'
         protocol: TCP
+  egress:
+  - toCIDR:
+    - "{{ apiserver_endpoint }}/32"
+    toPorts:
+    - ports:
+      - port: '6443'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: allow-api-from-router
+spec:
+  ingress:
+  - fromEntities:
+    - kube-apiserver
+    toPorts:
+    - ports:
+      - port: '10250'
+        protocol: TCP
+  egress:
+  - toCIDR:
+    - "{{ apiserver_endpoint }}/32"
+    toPorts:
+    - ports:
+      - port: '6443'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: allow-api-to-vip
+spec:
+  
   egress:
   - toCIDR:
     - "{{ apiserver_endpoint }}/32"
