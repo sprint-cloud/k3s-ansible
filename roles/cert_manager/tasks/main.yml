@@ -22,26 +22,17 @@
     - cm
 
 - name: Wait for Cert Manager resources
-  ansible.builtin.command: >-
-    {% if item.type == 'daemonset' %}
+  ansible.builtin.command: >
     {{ k3s_kubectl_binary | default('k3s kubectl') }} wait pods
     --namespace={{ cm_namespace }}
-    --selector={{ item.selector }}
+    --selector=app.kubernetes.io/name=cert-manager
     --for=condition=Ready
-    {% else %}
-    {{ k3s_kubectl_binary | default('k3s kubectl') }} wait {{ item.type }}/{{ item.name }}
-    --namespace={{ cm_namespace }}
-    --for=condition=Available
-    {% endif %}
     --timeout={{ cm_check_timeout }}
   register: cr_result
   changed_when: false
   until: cr_result is succeeded
   retries: 30
   delay: 7
-  with_items: []
-  loop_control:
-    label: "{{ item.type }}/{{ item.name }}"
   tags:
     - cm
 
