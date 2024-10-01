@@ -16,7 +16,7 @@ cilium_chart_values:
   policyEnforcementMode: "{{ cilium_pol_enforcement_mode }}"
   hostFirewall:
     enabled: false
-  devices: eth0
+  devices: "{{ k3s_cni_iface }}"
   operator:
     replicas: 1
   ipam:
