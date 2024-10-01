@@ -10,3 +10,5 @@ longhorn_chart_values:
     defaultDataLocality: strict-local
     migratable: false
     reclaimPolicy: Delete
+  networkPolicies:
+    enabled: true
