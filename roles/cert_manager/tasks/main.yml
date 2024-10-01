@@ -42,7 +42,7 @@
     cmd: >-
       {{ k3s_kubectl_binary | default('k3s kubectl') }} create secret generic {{ cm_cf_secretname }}
       --namespace {{ cm_namespace }}
-      --from-literal=cloudflare-token=token
+      --from-literal=cloudflare-token="{{ cm_cf_token }}"
       --dry-run=client
       --output=yaml
   register: cf_secret
@@ -51,16 +51,18 @@
     - cloudflare
   when: ansible_hostname == hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname']
 
+# TODO: Directly apply secret without storing it.
 - name: Copy Generated secret to manifests dir
   ansible.builtin.copy:
-    content: "{{ cf_secret }}"
-    dest: /var/lib/rancher/k3s/server/manifests/cm/cf_token_secret.yaml
+    content: "{{ cf_secret.stdout }}"
+    dest: /var/lib/rancher/k3s/server/manifests/cm/cf-token-secret.yaml
     owner: root
     group: root
     mode: "0644"
   tags:
     - cm
     - cloudflare
+    - issuers
   when: ansible_hostname == hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname']
 
 - name: Configure Letsencrypt cluster issuers
