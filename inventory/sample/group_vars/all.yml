@@ -44,9 +44,9 @@ cilium_pol_auditonly: true
 
 
 ### Cert-manager ###
-cm_acme_email: j.luchtenberg@protonmail.com
-cm_cf_token: 2w1XgNkbkqu3xLlDVT5utBbgQ6-boS-WjBNwZi0y
-cm_domain: sprinthub.nl
+cm_acme_email: admin@example.com
+cm_cf_token: ChangeToCloudflareToken
+cm_domain: example.com
 
 # Disable the taint manually by setting: k3s_master_taint = false
 k3s_master_taint: "{{ true if groups['node'] | default([]) | length >= 1 else false }}"
