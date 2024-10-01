@@ -35,16 +35,33 @@
   delay: 7
   tags:
     - cm
+  when: ansible_hostname == hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname']
 
-- name: Create Cloudflare secret
-  ansible.builtin.command: >-
-    {{ k3s_kubectl_binary | default('k3s kubectl') }} create secret generic
-    --namespace {{ cm_namespace }}
-    --from-literal=cloudflare-token=token
-    {{ cm_cf_secretname }}
-  changed_when: false
+- name: Generate Cloudflare secret
+  ansible.builtin.command:
+    cmd: >-
+      {{ k3s_kubectl_binary | default('k3s kubectl') }} create secret generic {{ cm_cf_secretname }}
+      --namespace {{ cm_namespace }}
+      --from-literal=cloudflare-token=token
+      --dry-run=client
+      --output=yaml
+  register: cf_secret
   tags:
     - cm
+    - cloudflare
+  when: ansible_hostname == hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname']
+
+- name: Copy Generated secret to manifests dir
+  ansible.builtin.copy:
+    content: "{{ cf_secret }}"
+    dest: /var/lib/rancher/k3s/server/manifests/cm/cf_token_secret.yaml
+    owner: root
+    group: root
+    mode: "0644"
+  tags:
+    - cm
+    - cloudflare
+  when: ansible_hostname == hostvars[groups[group_name_master | default('master')][0]]['ansible_hostname']
 
 - name: Configure Letsencrypt cluster issuers
   ansible.builtin.template:
@@ -55,6 +72,7 @@
     mode: "0644"
   tags:
     - cm
+    - cloudflare
     - issuers
   with_items:
     - "{{ cm_acme }}"
